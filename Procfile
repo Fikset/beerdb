@@ -1,1 +1,1 @@
-web: gunicorn beerdb.app:app
+web: gunicorn src.app:app
