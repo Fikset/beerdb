@@ -23,6 +23,7 @@ class Fetcher:
             return response.json()
 
     def save_to_file(self, response_result):
+        os.makedirs(self.data_dir, exist_ok=True)
         with open(os.path.join(self.data_dir, f'raw_data_page={self.page_number}.json'), 'w', encoding="utf-8") as f:
             json.dump(response_result, f)
 

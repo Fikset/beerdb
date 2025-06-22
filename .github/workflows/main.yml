@@ -1,32 +1,58 @@
 name: CI/CD
 
-# Controls when the workflow will run
 on:
-  # Activates the workflow; then there is a push to the main or master branch
   push:
     branches: [main, master]
-
-  # allows you to manually execute this pipeline from the Actions tab.
+  pull_request:
+    branches: [main, master]
   workflow_dispatch:
 
-# A workflow run consists of one or more jobs that can be executed either sequentially or concurrently.
 jobs:
-  # This workflow contains a single job called "build"
-  build:
-    # The type of runner that the job will run on
+  test:
     runs-on: ubuntu-latest
-
-    #
+    
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
-      - run: pip install -r requirements.txt  # install requirements to enable GitHub run tests
-      - run:  chmod +x ./src/Server.py
-      - run:  python -m pytest test/test_app.py
-      - run:  python test/data_fetcher/test_fetcher.py
-
-      - uses: akhileshns/heroku-deploy@v3.12.12 #
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
         with:
-          heroku_api_key: api-key
-          heroku_app_name: beerdb
-          heroku_email: mail@gmail.com
+          python-version: '3.9'
+          cache: 'pip'
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      
+      - name: Make server executable
+        run: chmod +x ./src/Server.py
+      
+      - name: Run pytest tests
+        run: python -m pytest test/test_app.py -v
+      
+      - name: Run data fetcher tests
+        run: python -m pytest test/data_fetcher/test_fetcher.py -v
+        
+      - name: Run mock tests
+        run: python -m pytest test/test_mocks.py -v
+        
+      - name: Run integration tests  
+        run: python -m pytest test/integration/test_integration.py -v
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Deploy to Heroku
+        uses: akhileshns/heroku-deploy@v3.12.14
+        with:
+          heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
+          heroku_app_name: ${{ secrets.HEROKU_APP_NAME }}
+          heroku_email: ${{ secrets.HEROKU_EMAIL }}

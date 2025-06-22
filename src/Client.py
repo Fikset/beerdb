@@ -19,5 +19,5 @@ class Client:
         message = str(a) + " " + str(b)
         self.socket.send(message.encode())
 
-        response, _ = self.socket.recv(1024).decode()
-        return response
+        response = self.socket.recv(1024).decode()
+        return int(response)
