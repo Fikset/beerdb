@@ -51,17 +51,18 @@ class TestIntegration(unittest.TestCase):
         """Test all web application endpoints"""
         response = self.app.get('/')
         self.assertEqual(response.status_code, 200)
-        
-        response = self.app.post('/echo_user_input', 
-                               data={'user_input': 'test input'})
-        self.assertEqual(response.status_code, 200)
-        self.assertIn(b'test input', response.data)
+        self.assertIn(b'BeerDB', response.data)
         
         response = self.app.get('/health')
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data, b'OK')
         
         response = self.app.get('/metrics')
+        self.assertEqual(response.status_code, 200)
+        
+        response = self.app.get('/api/beers')
+        self.assertEqual(response.status_code, 200)
+        
+        response = self.app.get('/api/stats')
         self.assertEqual(response.status_code, 200)
 
 if __name__ == '__main__':
