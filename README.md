@@ -26,7 +26,7 @@ The system must provide:
 - **Testable**: Event publishing and subscription can be verified in tests
 
 ### ✅ REST API Implementation
-**Locations**: `src/app.py`, `src/Client.py`, `src/Server.py`
+**Locations**: `src/app.py`
 - **Web API**: Flask-based REST endpoints (`/`, `/api/fetch`, `/api/beers`, `/api/analyze`, `/api/stats`, `/health`, `/metrics`)
 - **HTTP Methods**: GET and POST request handling
 - **Content Types**: JSON and form-data processing
